@@ -1,4 +1,5 @@
 import pygame
+import math
 from poo.game import Game
 pygame.init()
 
@@ -9,7 +10,20 @@ class Window(Game):
         pygame.display.set_caption("Shooter Game")
         self.screen_size = (720, 380)
         self.screen = pygame.display.set_mode(self.screen_size)
+
         self.background = pygame.image.load("assets/bg.jpg")
+
+        self.banner = pygame.image.load("assets/banner.png")
+        self.banner = pygame.transform.scale(self.banner, (300, 300))
+        self.banner_rect = self.banner.get_rect()
+        self.banner_rect.x = math.ceil(self.screen.get_width() / 4)
+
+        self.play_button = pygame.image.load("assets/button.png")
+        self.play_button = pygame.transform.scale(self.play_button, (200, 100))
+        self.play_button_rect = self.play_button.get_rect()
+        self.play_button_rect.x = math.ceil(self.screen.get_width() / 3)
+        self.play_button_rect.y = math.ceil(self.screen.get_height() / 1.8)
+
         self.running = True
         self.game = Game()
         self.clock = pygame.time.Clock()
@@ -19,32 +33,14 @@ class Window(Game):
         while self.running:
 
             self.screen.blit(self.background, (-100, -500))
-            self.screen.blit(self.game.player.image, (self.game.player.rect.x, self.game.player.rect.y))
-            self.game.player.update_health_bar(self.screen)
 
-            """Recuperation de toutes les attacks dans le panier du joueur"""
-            for attack in self.game.player.all_projectile:
-                attack.switch()
-            """Afficher les attacks du joueur"""
-            self.game.player.all_projectile.draw(self.screen)
-
-
-            """Récupérer les monstres du joueur"""
-            for monster in self.game.all_monsters:
-                monster.forward()
-                monster.update_health_bar(self.screen)
-            """Affiche les images du groupe de monstre"""
-            self.game.all_monsters.draw(self.screen)
-
-
-            """Vérification de la position voulue par le joueur"""
-            left_possible = self.game.player.rect.x > 0
-            right_possible = self.game.player.rect.x + self.game.player.rect.width < self.screen.get_width()
-
-            if self.game.pressed_keys.get(pygame.K_LEFT) and left_possible:
-                self.game.player.move_left()
-            elif self.game.pressed_keys.get(pygame.K_RIGHT) and right_possible:
-                self.game.player.move_right()
+            #verify
+            if self.game.is_playing:
+                self.game.update(self.screen)
+            else:
+                self.screen.blit(self.play_button, self.play_button_rect)
+                self.screen.blit(self.banner, self.banner_rect)
+            self.clock.tick(self.FPS)
 
             pygame.display.flip()
             self.clock.tick(self.FPS)
@@ -68,6 +64,11 @@ class Window(Game):
                 elif event.type == pygame.KEYUP:
                     """Désactivation des touches du clavier"""
                     self.game.pressed_keys[event.key] = False
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.play_button_rect.collidepoint(event.pos):
+                        self.game.is_playing = True
+                        self.game.start()
 
 
 app = Window()
