@@ -11,15 +11,31 @@ class Player(pygame.sprite.Sprite):
         self.health = 100
         self.max_health = 100
 
-        self.attack = 50
+        self.attack = 20
         self.speed = 1
         self.jump = 100
         self.all_projectile = pygame.sprite.Group()
 
         self.image = pygame.image.load("assets/player.png")
         self.rect = self.image.get_rect()
-        self.rect.x = 90 # position gauche/droite (gauche:Min --> droite:Max)
-        self.rect.y = 200  # position haut/bas (Bas:Min --> Haut:Max)
+        self.rect.x = 90
+        self.rect.y = 200
+
+    def damage(self, points):
+        if self.health - points > points:
+            self.health -= points
+
+
+    def update_health_bar(self, surface):
+        bar_color = (111, 210, 46)
+        back_bar_color = (60, 63, 60)
+
+        bar_position = [self.rect.x+50 , self.rect.y+20, self.health, 5] #[x, y, w, h]
+        back_bar_position = [self.rect.x+50 , self.rect.y+20, self.max_health, 5]  # [x, y, w, h]
+
+        #dessin
+        pygame.draw.rect(surface, back_bar_color, back_bar_position)
+        pygame.draw.rect(surface, bar_color, bar_position)
 
     def move_left(self):
         self.rect.x -= self.speed

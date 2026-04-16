@@ -7,17 +7,20 @@ class Window(Game):
     def __init__(self):
         Game.__init__(self)
         pygame.display.set_caption("Shooter Game")
-        self.screen_size = (620, 380)
+        self.screen_size = (720, 380)
         self.screen = pygame.display.set_mode(self.screen_size)
         self.background = pygame.image.load("assets/bg.jpg")
         self.running = True
         self.game = Game()
+        self.clock = pygame.time.Clock()
+        self.FPS = 60
 
     def show(self):
         while self.running:
 
             self.screen.blit(self.background, (-100, -500))
             self.screen.blit(self.game.player.image, (self.game.player.rect.x, self.game.player.rect.y))
+            self.game.player.update_health_bar(self.screen)
 
             """Recuperation de toutes les attacks dans le panier du joueur"""
             for attack in self.game.player.all_projectile:
@@ -29,6 +32,7 @@ class Window(Game):
             """Récupérer les monstres du joueur"""
             for monster in self.game.all_monsters:
                 monster.forward()
+                monster.update_health_bar(self.screen)
             """Affiche les images du groupe de monstre"""
             self.game.all_monsters.draw(self.screen)
 
@@ -43,6 +47,7 @@ class Window(Game):
                 self.game.player.move_right()
 
             pygame.display.flip()
+            self.clock.tick(self.FPS)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
